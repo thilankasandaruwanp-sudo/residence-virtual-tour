@@ -1,18 +1,31 @@
-RESIDENCE 082 — GITHUB UPLOAD PACKAGE
+RESIDENCE 082 — WEBSITE PACKAGE
 
-Upload the index.html file and the complete assets folder together to the ROOT of your GitHub repository.
+Upload index.html and the entire assets folder to the ROOT of your GitHub repository.
 
 Required structure:
 index.html
 assets/
-  aerial-3d-plan.jpg
+  aerial-plan.jpg
   front-elevation.jpg
-  original-floor-plan.jpg
+  original-floor-plan.png
+  master-lounge.jpg
+  dining-pantry.jpg
+  wet-kitchen.jpg
+  bedroom-01.jpg
+  bedroom-02.jpg
+  bedroom-03.jpg
+  bathroom.jpg
+  courtyard.jpg
+  car-porch.jpg
+  exterior-view.jpg
+  design-reference.jpg
 
-Important:
-- Do not upload only index.html. The three image files in assets are required.
-- Keep the assets folder name exactly as shown.
-- Commit to the main branch.
-- GitHub Pages should use GitHub Actions (or deploy from main/root if you configure that instead).
+Features:
+- Original aerial reference image with clickable room hotspots
+- Room gallery and room-to-room navigation
+- Drag-to-pan and zoomable interior photo viewer
+- Original technical floor plan view
+- Responsive desktop/mobile layout
 
-This website presents the user's supplied aerial 3D plan, front elevation and original floor plan. Hotspots are clickable room references, not a measured BIM model or actual first-person 3D walkthrough. The original drawing remains the authority for layout and dimensions.
+Important accuracy note:
+The source aerial plan, front elevation and technical drawing are the user's supplied files. Interior room images are concept crops from generated visual references and are not true 360-degree equirectangular panoramas or photographs of the actual built house. The viewer provides drag-to-pan/zoom presentation behavior, not a full spherical 360 scan or continuous first-person 3D walk. To deliver genuine 360° walkthrough, each room needs a real 360 camera capture or a purpose-built equirectangular panorama.
