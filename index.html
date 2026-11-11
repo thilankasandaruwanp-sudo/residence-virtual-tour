@@ -58,6 +58,17 @@ footer{padding:18px 24px;border-top:1px solid var(--line);color:#8f9085;font-siz
 .thumbs{gap:5px;padding:7px}.thumb{min-width:84px;width:84px}.thumb img{height:50px}.room-list{grid-template-columns:repeat(2,1fr)}.room-tile img{height:90px}
 .below{padding:22px 10px 35px}.below-head{display:block}.below-head p{margin-top:9px}.plan-foot{font-size:8px}.original{padding:22px 12px}
 }
+
+.viewer-controls .viewmode.active{background:var(--gold);border-color:var(--gold);color:#171913}
+.viewer-controls .back:hover,.viewer-controls button:hover{border-color:var(--gold2);color:var(--gold2)}
+.viewer-controls .viewmode.active:hover{color:#171913}
+.viewer{touch-action:none}
+.viewer img{will-change:transform;transform-origin:center center}
+body.night{--bg:#080b0a;--panel:#111713;--panel2:#1b241e;--paper:#e7eee8;--muted:#a4b0a8}
+body.night .top{background:#080d0b}
+body.night .plan-card,body.night .tour-card,body.night .room-tile{background:#111713}
+#room-status{font-size:9px;color:var(--gold2);letter-spacing:.12em}
+@media(max-width:650px){.viewer-controls .viewmode{padding:0 7px;font-size:8px}.viewer-controls{gap:4px}}
 </style>
 </head>
 <body>
@@ -94,7 +105,7 @@ footer{padding:18px 24px;border-top:1px solid var(--line);color:#8f9085;font-siz
    <div class="viewer-shade"></div><div class="view-label" id="view-label">MASTER LOUNGE · INTERIOR CONCEPT</div>
    <div class="drag-tip">DRAG TO LOOK AROUND · + / − TO ZOOM</div>
    <button class="move-hotspot" id="move-hotspot">⌃ MOVE VIEWPOINT</button>
-   <div class="viewer-controls"><button class="back" id="back-plan2">← FLOOR PLAN</button><div><button id="prev">‹</button> <button id="zoomout">−</button> <button id="zoomin">+</button> <button id="next">›</button></div><button class="viewmode" id="room-fullscreen">⛶ FULL</button></div>
+   <div class="viewer-controls"><button class="back" id="back-plan2">← FLOOR PLAN</button><div><button id="prev">‹</button> <button id="zoomout" title="Zoom out">−</button> <button id="zoomin" title="Zoom in">+</button> <button id="next" title="Next room">›</button></div><button class="viewmode" id="toggle-360">↻ 360°</button><button class="viewmode" id="room-fullscreen">⛶ FULL</button></div>
   </div>
   <div class="thumbs" id="thumbs"></div>
  </div>
@@ -121,30 +132,34 @@ const rooms=[
 {id:'court',name:'Courtyard',type:'LANDSCAPED COURTYARD',image:'courtyard.jpg',desc:'A tropical garden concept with stepping stones, planting and warm landscape lighting.'},
 {id:'porch',name:'Car Porch',type:'TWO-CAR PARKING',image:'car-porch.jpg',desc:'A covered two-car porch concept with clean paving and warm exterior lighting.'}
 ];
-let current=0,scale=1,offset=0,dragging=false,startX=0,startOffset=0,viewStep=0;
+let current=0,scale=1,offsetX=0,offsetY=0,dragging=false,startX=0,startY=0,startOffsetX=0,startOffsetY=0,viewStep=0,auto360=false,raf360=0,autoStart=0;
 const img=document.querySelector('#room-image'),viewer=document.querySelector('#viewer');
+const status=document.createElement('span');status.id='room-status';status.textContent='DRAG TO LOOK AROUND';document.querySelector('.tour-title').appendChild(status);
+function applyView(){img.style.transform=`translate(${offsetX}px,${offsetY}px) scale(${scale})`}
+function stop360(){auto360=false;cancelAnimationFrame(raf360);document.querySelector('#toggle-360').classList.remove('active');document.querySelector('#toggle-360').textContent='↻ 360°';status.textContent='DRAG TO LOOK AROUND'}
+function animate360(t){if(!auto360)return;if(!autoStart)autoStart=t;const elapsed=(t-autoStart)/1000;offsetX=Math.sin(elapsed*.42)*Math.min(150,viewer.clientWidth*.16);offsetY=Math.sin(elapsed*.21)*12;applyView();raf360=requestAnimationFrame(animate360)}
+function start360(){if(auto360){stop360();return}auto360=true;autoStart=0;document.querySelector('#toggle-360').classList.add('active');document.querySelector('#toggle-360').textContent='Ⅱ PAUSE';status.textContent='360° PANORAMIC PREVIEW · AUTO ROTATING';raf360=requestAnimationFrame(animate360)}
 function render(){
- const r=rooms[current];document.querySelector('#room-title').textContent=r.name;
- document.querySelector('#room-subtitle').textContent=r.type+' · PHOTO-PAN WALKTHROUGH';
+ const r=rooms[current];stop360();document.querySelector('#room-title').textContent=r.name;
+ document.querySelector('#room-subtitle').textContent=r.type+' · INTERIOR CONCEPT';
  document.querySelector('#view-label').textContent=r.name.toUpperCase()+' · INTERIOR CONCEPT';
- document.querySelector('#room-description')?.remove();
- img.src='assets/'+r.image;img.alt=r.name+' concept interior view';scale=1;offset=0;viewStep=0;applyPan();
+ img.src='assets/'+r.image;img.alt=r.name+' concept interior view';scale=1;offsetX=0;offsetY=0;viewStep=0;applyView();
  document.querySelectorAll('.pin').forEach(p=>p.classList.toggle('selected',p.dataset.room===r.id));
  document.querySelectorAll('.thumb').forEach((p,i)=>p.classList.toggle('active',i===current));
 }
-function applyPan(){img.style.transform=`translateX(${offset}px) scale(${scale})`}
 function choose(id){const i=rooms.findIndex(r=>r.id===id);if(i>=0){current=i;render()}}
 document.querySelectorAll('.pin').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.room)));
 document.querySelector('#prev').onclick=()=>{current=(current+rooms.length-1)%rooms.length;render()};
 document.querySelector('#next').onclick=()=>{current=(current+1)%rooms.length;render()};
-document.querySelector('#zoomin').onclick=()=>{scale=Math.min(1.8,scale+.12);applyPan()};
-document.querySelector('#zoomout').onclick=()=>{scale=Math.max(1,scale-.12);if(scale===1)offset=0;applyPan()};
-document.querySelector('#move-hotspot').onclick=()=>{viewStep=(viewStep+1)%3;scale=1.12+viewStep*.12;offset=viewStep===1?-45:viewStep===2?45:0;applyPan()};
+document.querySelector('#zoomin').onclick=()=>{scale=Math.min(2.4,scale+.15);applyView();status.textContent='ZOOM '+Math.round(scale*100)+'%'};
+document.querySelector('#zoomout').onclick=()=>{scale=Math.max(1,scale-.15);if(scale===1){offsetX=0;offsetY=0}applyView();status.textContent='ZOOM '+Math.round(scale*100)+'%'};
+document.querySelector('#toggle-360').onclick=start360;
+document.querySelector('#move-hotspot').onclick=()=>{stop360();viewStep=(viewStep+1)%4;const w=viewer.clientWidth;offsetX=[0,-w*.12,w*.12,0][viewStep];offsetY=[0,8,-8,0][viewStep];scale=viewStep===3?1.12:1.08;applyView();status.textContent=['FRONT VIEW','LEFT VIEW','RIGHT VIEW','FOCUSED VIEW'][viewStep]};
 document.querySelector('#back-plan').onclick=document.querySelector('#back-plan2').onclick=()=>document.querySelector('.plan-card').scrollIntoView({behavior:'smooth',block:'center'});
-viewer.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX;startOffset=offset;viewer.classList.add('dragging');viewer.setPointerCapture(e.pointerId)});
-viewer.addEventListener('pointermove',e=>{if(!dragging)return;offset=Math.max(-180,Math.min(180,startOffset+e.clientX-startX));applyPan()});
+viewer.addEventListener('pointerdown',e=>{stop360();dragging=true;startX=e.clientX;startY=e.clientY;startOffsetX=offsetX;startOffsetY=offsetY;viewer.classList.add('dragging');viewer.setPointerCapture(e.pointerId)});
+viewer.addEventListener('pointermove',e=>{if(!dragging)return;offsetX=Math.max(-viewer.clientWidth*.35,Math.min(viewer.clientWidth*.35,startOffsetX+e.clientX-startX));offsetY=Math.max(-viewer.clientHeight*.22,Math.min(viewer.clientHeight*.22,startOffsetY+e.clientY-startY));applyView()});
 ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>viewer.addEventListener(ev,()=>{dragging=false;viewer.classList.remove('dragging')}));
-viewer.addEventListener('wheel',e=>{e.preventDefault();scale=Math.max(1,Math.min(1.8,scale+(e.deltaY<0?.06:-.06)));applyPan()},{passive:false});
+viewer.addEventListener('wheel',e=>{e.preventDefault();stop360();scale=Math.max(1,Math.min(2.4,scale+(e.deltaY<0?.08:-.08)));applyView();status.textContent='ZOOM '+Math.round(scale*100)+'%'},{passive:false});
 const thumbs=document.querySelector('#thumbs'),list=document.querySelector('#room-list');
 rooms.forEach((r,i)=>{
  const b=document.createElement('button');b.className='thumb'+(i===0?' active':'');b.innerHTML=`<img src="assets/${r.image}" alt=""><span>${r.name}</span>`;b.onclick=()=>choose(r.id);thumbs.appendChild(b);

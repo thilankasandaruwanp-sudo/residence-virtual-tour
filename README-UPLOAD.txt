@@ -1,31 +1,17 @@
-RESIDENCE 082 — WEBSITE PACKAGE
+RESIDENCE 082 — UPDATED INTERACTIVE WEBSITE
 
 Upload index.html and the entire assets folder to the ROOT of your GitHub repository.
 
-Required structure:
-index.html
-assets/
-  aerial-plan.jpg
-  front-elevation.jpg
-  original-floor-plan.png
-  master-lounge.jpg
-  dining-pantry.jpg
-  wet-kitchen.jpg
-  bedroom-01.jpg
-  bedroom-02.jpg
-  bedroom-03.jpg
-  bathroom.jpg
-  courtyard.jpg
-  car-porch.jpg
-  exterior-view.jpg
-  design-reference.jpg
+Buttons and controls:
+- Room pins open their matching room concept image.
+- 360° button starts/stops an automatic panoramic-style preview movement.
+- Drag with mouse or finger to pan the room image horizontally and vertically.
+- + / - buttons and mouse wheel zoom in/out.
+- MOVE VIEWPOINT cycles through alternate image framing positions.
+- Previous/next arrows change rooms.
+- FULL opens the room viewer in browser fullscreen where supported.
+- Day/Night changes the site theme.
+- Floor Plan returns the user to the plan.
 
-Features:
-- Original aerial reference image with clickable room hotspots
-- Room gallery and room-to-room navigation
-- Drag-to-pan and zoomable interior photo viewer
-- Original technical floor plan view
-- Responsive desktop/mobile layout
-
-Important accuracy note:
-The source aerial plan, front elevation and technical drawing are the user's supplied files. Interior room images are concept crops from generated visual references and are not true 360-degree equirectangular panoramas or photographs of the actual built house. The viewer provides drag-to-pan/zoom presentation behavior, not a full spherical 360 scan or continuous first-person 3D walk. To deliver genuine 360° walkthrough, each room needs a real 360 camera capture or a purpose-built equirectangular panorama.
+Important:
+The supplied floor plan and exterior are retained. The room pictures are illustrative concept images, not actual photos of the built residence. The 360° button is an auto-pan presentation effect over a 2D image, not a true spherical 360-degree panorama or a continuous walkable 3D model. For genuine 360-degree room viewing, each room needs a true equirectangular 360 capture or a purpose-built 3D scene.
